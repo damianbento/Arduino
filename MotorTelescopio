@@ -1,0 +1,72 @@
+#include <Stepper.h>
+// Define number of steps per rotation:
+const int stepsPerRevolution = 100;
+
+int pin7 = 7;   // choose the input pin (for a pushbutton)
+int pin6 = 6;
+int pin5 = 5;
+int val = 0;     // variable for reading the pin status
+int val1 = 0;
+int seg = 0;
+
+Stepper myStepper = Stepper(stepsPerRevolution, 8, 10, 9, 11);
+void setup() {
+  // Set the speed to 5 rpm:
+  myStepper.setSpeed(300);
+  pinMode(pin7, INPUT);
+  // Begin Serial communication at a baud rate of 9600:
+ Serial.begin(9600);
+}
+
+void loop() {
+  
+val = digitalRead(pin7);  // read input value
+  if (val == HIGH) {         // check if the input is HIGH (button released)
+                     // ping7 HIGH                 
+                     myStepper.setSpeed(250);
+                     myStepper.step(-stepsPerRevolution);
+                  
+  
+                  } 
+                  else {
+                        val1 = digitalRead(pin6);  // read input value
+                        if (val1 == HIGH) {         // check if the input is HIGH (button released)
+                                           // Pin6 HIGH
+                                           myStepper.setSpeed(250);
+                                           myStepper.step(stepsPerRevolution);
+                                       
+                                          } 
+                                            else {
+                                                   seg = digitalRead(pin5);  // read input value
+                                                   if (seg == HIGH) {         // check if the input is HIGH (button released)
+                                                                    delay(100);
+                                                                    const int stepsPerRevolution = 10;
+                                                                    int seg1 = 0;
+                                                                    for (int i = 0; i <= 9000; i++) {
+                                                                    // Serial.print("Valor i ");                                                    
+                                                                    // Serial.print(i);                                                                                                            
+                                                                    // Serial.print("\n"); 
+                                                                    myStepper.setSpeed(5);
+                                                                    myStepper.step(stepsPerRevolution);
+                                                                    seg1 = digitalRead(pin5);
+                                                                    Serial.print(seg1);  
+                                                                    if (seg1 == 1){
+                                                                                   i = 8999;
+                                                                    }
+                                                                                        }
+                                                                     digitalWrite(8, LOW);
+                                                                     digitalWrite(9, LOW);
+                                                                     digitalWrite(10, LOW);
+                                                                     digitalWrite(11, LOW);
+                                                                    } else {
+                                                                            digitalWrite(8, LOW);
+                                                                            digitalWrite(9, LOW);
+                                                                            digitalWrite(10, LOW);
+                                                                            digitalWrite(11, LOW);
+                                                            
+                                                                            }
+                                                   }
+                          
+  }
+}
+  
