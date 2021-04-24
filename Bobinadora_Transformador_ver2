@@ -1,0 +1,322 @@
+//---------------Librerias------------------//
+
+#include <LiquidCrystal_I2C.h> // Libreria LCD_I2C
+LiquidCrystal_I2C lcd(0x27,16,2); // si no te sale con esta direccion  puedes usar (0x3f,16,2) || (0x27,16,2)  ||(0x20,16,2) 
+
+//-------------End librerias---------------//
+
+
+//-----Definicion de variables y pines-----//
+int mosfet = 5; // Set pin que va al gate del mosfet para activar motor DC
+int start = 7;  // Set pin para activar Mosfet
+int cont = 6;  //Set pin para switch cuenta vueltas
+int IN1 = 8;  //
+int IN2 = 9;  //   Set pines para el motos stepper
+int IN3 = 10; //
+int IN4 = 11; //
+int der = 3;
+int izq = 4;
+int swp=0;
+int capa=0;
+int demora = 4;
+int cuenta = 0;
+int pulso = 0;
+int vtotal = 1000;  // ingresar la cantidad de vueltas del bobinado
+int carrete = 33; // definir el ancho del carrete mm //
+float diametro = 0.16;  // definir el diametro del alambre mm
+// ------------------------//
+int cp = 0; // cantidad de capas
+int ccc = 1; //contador de cantidad de capas arranca en 1 para que sea impar 
+int vpc = 0; // vueltas por capa
+int cvpc = 0; // contador de vueltas por capa
+int resto = 0; // es la cantidad de vueltas de la ultima capa del bobinado
+//-------------End---------------//
+
+
+// Funcion para poner en 0  todos los pines del motor
+void cero(){ 
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+}
+
+//-------------End---------------//
+
+/*
+// funcion para mover el carro a la izquierda
+void izquierda() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+}
+*/
+
+void izquierda() {
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+
+
+}
+
+
+//-------------End---------------//
+/*
+// funcion para mover el carro a la derecha
+void derecha() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+}
+*/
+
+void derecha() {
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, HIGH);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, LOW);
+delay(demora);
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  digitalWrite(IN3, LOW);
+  digitalWrite(IN4, HIGH);
+delay(demora);
+
+
+
+}
+
+
+
+
+
+//-------------End---------------//
+
+void setup() {
+lcd.init();
+lcd.backlight();
+lcd.clear();
+lcd.print("V.T:"+String(vtotal));
+lcd.setCursor(10,0);
+lcd.print("O=");
+lcd.print(diametro);
+Serial.begin(9600);
+Serial.println("iniciando comunicacion Serial 9600");
+// setting pins //
+pinMode(mosfet, OUTPUT);
+pinMode(start, INPUT);
+pinMode(IN1, OUTPUT);
+pinMode(IN2, OUTPUT);
+pinMode(IN3, OUTPUT);
+pinMode(IN4, OUTPUT);
+pinMode(mosfet, OUTPUT);
+pinMode(start, INPUT);
+pinMode(cont, INPUT);
+pinMode(der, INPUT);
+pinMode(izq, INPUT);
+digitalWrite(mosfet, LOW);
+attachInterrupt( 0, ServicioBoton, FALLING);
+// fin settings pins //
+
+vpc = carrete/diametro;
+Serial.print("Cantidad de vueltas por capa (vpc): ");
+Serial.println(vpc);
+pulso = (156 * diametro / 10);  //config original  pulso = (156* diametro / 10);  //
+Serial.print("pulso: ");
+Serial.println(pulso);
+Serial.print("Vueltas totales (vueltas): ");
+Serial.println(vtotal);
+cp = vtotal/vpc;
+Serial.print("Capas totales (capa): ");
+Serial.println(cp);
+resto=vtotal-(vpc*cp);
+Serial.print("Resto de vuelta (resto): ");
+Serial.println(resto);
+Serial.print("Calculo pulso: ");
+Serial.println(pulso);
+Serial.print("Demora de los movimiento original 5: ");
+Serial.println(demora);
+
+}
+
+void ServicioBoton() 
+{    digitalWrite(mosfet, LOW);
+}
+
+void loop() {
+
+if(digitalRead(der) == HIGH){
+       delay(30);
+        if (digitalRead(der) == LOW){
+          for (int i=0; i < pulso; i++){
+                derecha();
+                cero();
+                }
+          }
+        }
+
+if(digitalRead(izq) == HIGH){
+       delay(30);
+        if (digitalRead(izq) == LOW){
+          for (int i=0; i < pulso; i++){
+                izquierda();
+                cero();
+                }
+          }
+        }
+
+
+
+
+if (digitalRead(start)==HIGH){
+    digitalWrite(mosfet,HIGH);
+    Serial.println("Se prende el motor");
+    lcd.setCursor(0,1);
+    lcd.print("On");
+}
+
+if (cuenta < vtotal ){
+
+    if(digitalRead(cont) == HIGH){
+       delay(10);
+        if (digitalRead(cont) == LOW){
+            cuenta++;
+            //Serial.println(cuenta);
+            lcd.setCursor(5,1);
+            lcd.print("Vuelt: "+String(cuenta));
+            if(ccc % 2 == 0){
+              if(vpc>swp){
+                for (int i=0; i < pulso; i++){
+                derecha();
+                cero();
+                }
+                swp++;
+               }
+              else{
+                ccc++;
+                swp=0;
+                }
+                        
+            }
+            else{
+                if(vpc>swp){
+                    for (int i=0; i < pulso; i++){
+                    izquierda();        
+                    cero();
+                    }
+                    swp++;
+                    }
+                else{
+                  ccc++;
+                  swp=0;
+                  }         
+            }
+            }
+            }
+        }
+else{
+      digitalWrite(mosfet,LOW);    
+     }         
+}
